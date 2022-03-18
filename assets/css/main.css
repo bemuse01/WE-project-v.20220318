@@ -1,0 +1,19 @@
+[v-cloak] {display: none;}
+
+
+*{
+    margin: 0;
+    padding: 0;
+}
+body{
+    background: white;
+    overflow: hidden;
+    position: absolute;
+}
+div#app{
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+}
