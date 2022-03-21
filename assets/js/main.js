@@ -67,11 +67,12 @@ new Vue({
 
         // render
         render(){
+            this.animateElement()
             this.renderThree()
+            TWEEN.update()
         },
         animate(){
             this.render()
-            this.animateElement()
             requestAnimationFrame(this.animate)
         }
     }

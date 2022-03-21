@@ -56,4 +56,7 @@ export default class{
     getMaterial(){
         return this.mesh.material
     }
+    getAttribute(name){
+        return this.mesh.geometry.attributes[name]
+    }
 }
