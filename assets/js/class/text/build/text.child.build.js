@@ -111,7 +111,7 @@ export default class{
         const end = {idx: array.length}
 
         const tw = new TWEEN.Tween(start)
-        .to(end, 5000)
+        .to(end, 3500)
         .onUpdate(() => this.onUpdateTween(array, opacity, start))
         .repeat(Infinity)
         .start()

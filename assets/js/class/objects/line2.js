@@ -61,7 +61,7 @@ export default class{
         this.mesh.geometry.setPositions(array)
     }
     setAttribute(name, array, itemSize){
-        this.mesh.geometry.setAttribute(name, new THREE.BufferAttribute(array, itemSize))
+        this.mesh.geometry.setAttribute(name, new THREE.InterleavedBufferAttribute(new THREE.InstancedInterleavedBuffer(array, itemSize), itemSize))
     }
     setUniform(name, value){
         this.mesh.material.uniforms[name].valeu = value
