@@ -1,4 +1,5 @@
 import Line from '../../objects/line.js'
+import Line2 from '../../objects/line2.js'
 import L from '../../../data/L.js'
 import Shader from '../shader/text.child.shader.js' 
 import * as THREE from '../../../lib/three.module.js'
@@ -11,7 +12,7 @@ export default class{
             width: 2160 * 0.02,
             height: 3840 * 0.02,
             color: 0xffffff,
-            size: 1
+            linewidth: 0.003
         }
 
         this.init()
@@ -21,12 +22,16 @@ export default class{
     // init
     init(){
         this.create()
-        this.createTween()
+        // this.createTween()
     }
 
 
     // create
     create(){
+        // this.createLine()
+        this.createLine2()
+    }
+    createLine(){
         const {position, opacity} = this.createAttribute()
 
         this.object = new Line({
@@ -45,6 +50,19 @@ export default class{
 
         this.group.add(this.object.get())
     }
+    createLine2(){
+        const {position, opacity} = this.createAttribute()
+
+        this.object = new Line2({
+            position: position,
+            color: this.param.color,
+            linewidth: this.param.linewidth,
+        })
+
+        this.group.add(this.object.get())
+
+        // console.log(this.object.get().geometry)
+    }
     createAttribute(){
         const {width, height} = this.param
         const position = []
@@ -54,7 +72,7 @@ export default class{
         const hh = height / 2
 
         L.points.forEach((e, i, a) => {
-            const {rx, ry, num} = e
+            const {rx, ry} = e
 
             const x = width * rx - wh
             const y = height * ry - hh
@@ -73,10 +91,10 @@ export default class{
     // tween
     createTween(){
         const start = {idx: 0}
-        const end = {idx: L.points.length + 1}
+        const end = {idx: L.points.length}
 
         const tw = new TWEEN.Tween(start)
-        .to(end, 3000)
+        .to(end, L.points.length * 2 * 10)
         .onUpdate(() => this.onUpdateTween(start))
         .repeat(Infinity)
         .start()
@@ -89,13 +107,13 @@ export default class{
 
 
     // animate
-    animate(){
-        const opacity = this.object.getAttribute('aOpacity')
+    // animate(){
+    //     const opacity = this.object.getAttribute('aOpacity')
 
-        for(let i = 0; i < opacity.array.length; i++){
-            opacity.array[i] -= 0.01
-        }
+    //     for(let i = 0; i < opacity.array.length; i++){
+    //         opacity.array[i] -= 0.005
+    //     }
 
-        opacity.needsUpdate = true
-    }
+    //     opacity.needsUpdate = true
+    // }
 }
