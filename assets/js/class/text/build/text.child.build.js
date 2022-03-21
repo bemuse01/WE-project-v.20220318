@@ -1,6 +1,5 @@
 import Line from '../../objects/line.js'
 import Line2 from '../../objects/line2.js'
-import Line3 from '../../objects/line3.js'
 import L from '../../../data/L.js'
 import Shader from '../shader/text.child.shader.js' 
 import * as THREE from '../../../lib/three.module.js'
@@ -14,7 +13,7 @@ export default class{
             width: 2160 * 0.02,
             height: 3840 * 0.02,
             color: 0xffffff,
-            linewidth: 0.003
+            linewidth: 0.0025
         }
 
         this.init()
@@ -31,8 +30,7 @@ export default class{
     // create
     create(){
         // this.createLine()
-        // this.createLine2()
-        this.createLine3()
+        this.createLine2()
     }
     createLine(){
         const {position, opacity} = this.createAttribute()
@@ -59,7 +57,7 @@ export default class{
         this.object = new Line2({
             position: position,
             materialOpt: {
-                color: new THREE.Color(this.param.color),
+                color: this.param.color,
                 linewidth: this.param.linewidth,
             }
         })
@@ -67,27 +65,6 @@ export default class{
         this.group.add(this.object.get())
 
         // console.log(this.object.get().geometry)
-    }
-    createLine3(){
-        const {position, opacity} = this.createAttribute3()
-        
-        this.object = new Line3({
-            position,
-            materialOpt: {
-                color: new THREE.Color(this.param.color),
-                lineWidth: 0.6,
-                resolution: new THREE.Vector2(this.size.el.w, this.size.el.h),
-                sizeAttenuation: true
-            }
-        })
-
-        const {count} = this.object.getAttribute('position')
-
-        this.object.setAttribute('aOpacity', new Float32Array(Array.from({length: count}, _ => 0)), 1)
-
-        console.log(this.object.get().geometry)
-
-        this.group.add(this.object.get())
     }
     createAttribute(){
         const {width, height} = this.param
@@ -107,31 +84,8 @@ export default class{
             opacity.push(0)
         })
 
-        // position.push(position[0], position[1], position[2])
-        // opacity.push(0)
-
-        return {position, opacity}
-    }
-    createAttribute3(){
-        const {width, height} = this.param
-        const position = []
-        const opacity = []
-
-        const wh = width / 2
-        const hh = height / 2
-
-        L.points.forEach((e, i, a) => {
-            const {rx, ry} = e
-
-            const x = width * rx - wh
-            const y = height * ry - hh
-
-            position.push(new THREE.Vector3(x, -y, 0))
-            // opacity.push(0)
-        })
-
         position.push(position[0], position[1], position[2])
-        // opacity.push(0)
+        opacity.push(0)
 
         return {position, opacity}
     }
@@ -139,30 +93,32 @@ export default class{
 
     // tween
     createTween(){
+        const opacity = this.object.getAttribute('aOpacity')
+        const array  = opacity.array
+
         const start = {idx: 0}
-        const end = {idx: L.points.length}
+        const end = {idx: array.length}
 
         const tw = new TWEEN.Tween(start)
-        .to(end, L.points.length * 2 * 10)
-        .onUpdate(() => this.onUpdateTween(start))
+        .to(end, 3500)
+        .onUpdate(() => this.onUpdateTween(array, opacity, start))
         .repeat(Infinity)
         .start()
     }
-    onUpdateTween({idx}){
-        const opacity = this.object.getAttribute('aOpacity')
-        opacity.array[Math.floor(idx)] = 1
+    onUpdateTween(array, opacity, {idx}){
+        array[Math.floor(idx)] = 1
         opacity.needsUpdate = true
     }
 
 
     // animate
-    // animate(){
-    //     const opacity = this.object.getAttribute('aOpacity')
+    animate(){
+        // const opacity = this.object.getAttribute('aOpacity')
 
-    //     for(let i = 0; i < opacity.array.length; i++){
-    //         opacity.array[i] -= 0.005
-    //     }
+        // for(let i = 0; i < opacity.array.length; i++){
+        //     opacity.array[i] -= 0.005
+        // }
 
-    //     opacity.needsUpdate = true
-    // }
+        // opacity.needsUpdate = true
+    }
 }
