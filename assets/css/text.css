@@ -4,8 +4,8 @@ div.text{
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    width: 100vw;
-    height: 100vh;
+    width: 100vmin;
+    height: 100vmin;
 }
 div.text-object-container{
     width: 100%;

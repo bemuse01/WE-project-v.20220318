@@ -13,7 +13,7 @@ export default class{
             width: 2160 * 0.02,
             height: 3840 * 0.02,
             color: 0xffffff,
-            linewidth: 0.0025
+            linewidth: 0.01
         }
 
         this.init()
@@ -56,10 +56,8 @@ export default class{
 
         this.object = new Line2({
             position: position,
-            materialOpt: {
-                color: this.param.color,
-                linewidth: this.param.linewidth,
-            }
+            color: this.param.color,
+            linewidth: this.param.linewidth,
         })
 
         this.group.add(this.object.get())
