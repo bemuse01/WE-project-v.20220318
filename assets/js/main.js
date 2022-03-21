@@ -1,5 +1,5 @@
 import App from './class/app/app.js'
-import Text from '../js/class/text/text.js'
+import Text from './class/text/text.js'
 
 import TextComp from './components/text/text.js'
 
@@ -12,7 +12,9 @@ new Vue({
         return{
             modules: {
                 app: App,
-                Text: Text
+                text: Text,
+            },
+            element: {
             }
         }
     },
@@ -21,28 +23,28 @@ new Vue({
     },
     methods: {
         init(){
-            this.initThree()
+            this.initBabylon()
             this.animate()
 
             window.addEventListener('resize', this.onWindowResize, false)
         },
 
 
-        // three
-        initThree(){
+        // babylon
+        initBabylon(){
             for(const module in this.modules){
                 const instance = this.modules[module]
                 
                 OBJECT[module] = new instance(OBJECT)
             }
         },
-        resizeThree(){
+        resizeBabylon(){
             for(let i in OBJECT){
                 if(!OBJECT[i].resize) continue
                 OBJECT[i].resize(OBJECT)
             }
         },
-        renderThree(){
+        renderBabylon(){
             for(let i in OBJECT){
                 if(!OBJECT[i].animate) continue
                 OBJECT[i].animate(OBJECT)
@@ -57,19 +59,23 @@ new Vue({
                 this.element[i].animate(OBJECT)
             }
         },
+        onClickProgress(e){
+            const {audio} = OBJECT
+            this.element.progress.group.hover.onClick(e, audio)
+        },
 
 
         // event
         onWindowResize(){
-            this.resizeThree()
+            this.resizeBabylon()
         },
 
 
         // render
         render(){
-            this.animateElement()
-            this.renderThree()
             TWEEN.update()
+            this.renderBabylon()
+            this.animateElement()
         },
         animate(){
             this.render()

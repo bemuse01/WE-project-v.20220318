@@ -1,24 +1,33 @@
-export default {
-    vertex: `
-        attribute float aOpacity;
+const shader = 'textChild'
 
-        varying float vOpacity;
+BABYLON.Effect.ShadersStore[shader + 'VertexShader'] = `
+    attribute vec3 position;
+    attribute vec2 uv;
+    attribute float aOpacity;
 
-        void main(){
-            gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+    uniform mat4 worldViewProjection;
 
-            vOpacity = aOpacity;
-        }
-    `,
-    fragment: `
-        varying float vOpacity;
+    varying vec2 vUv;
+    varying float vOpacity;
 
-        uniform vec3 uColor;
+    void main(){
+        gl_Position = worldViewProjection * vec4(position, 1.0);
 
-        void main(){
-            vec4 color = vec4(uColor, vOpacity);
+        vUv = uv;
+        vOpacity = aOpacity;
+    }
+`
+BABYLON.Effect.ShadersStore[shader + 'FragmentShader'] = `
+    varying vec2 vUv;
+    varying float vOpacity;
 
-            gl_FragColor = color;
-        }
-    `
-}
+    uniform vec3 uColor;
+    
+    void main(){
+        vec4 color = vec4(uColor, vOpacity);
+
+        gl_FragColor = color;
+    }
+`
+
+export default shader

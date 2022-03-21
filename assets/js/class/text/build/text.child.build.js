@@ -1,18 +1,18 @@
-import Line from '../../objects/line.js'
-import Line2 from '../../objects/line2.js'
 import L from '../../../data/L.js'
-import Shader from '../shader/text.child.shader.js' 
+import Line from '../../objects/line.js'
+import Shader from '../shader/text.child.shader.js'
 import * as THREE from '../../../lib/three.module.js'
 
 export default class{
-    constructor({group}){
-        this.group = group
+    constructor({engine, scene}){
+        this.engine = engine
+        this.scene = scene
 
         this.param = {
-            width: 2160 * 0.02,
-            height: 3840 * 0.02,
+            width: 2160 * 0.01,
+            height: 3840 * 0.01,
             color: 0xffffff,
-            linewidth: 0.003
+            linewidth: 0.3
         }
 
         this.init()
@@ -22,46 +22,34 @@ export default class{
     // init
     init(){
         this.create()
-        // this.createTween()
+        this.createTween()
     }
 
 
     // create
     create(){
-        // this.createLine()
-        this.createLine2()
+        this.createLine()
     }
     createLine(){
         const {position, opacity} = this.createAttribute()
 
         this.object = new Line({
+            name: 'line1',
+            scene: this.scene,
+            geometryOpt: {
+                path: position,
+                width: this.param.linewidth,
+                closed: true
+            },
             materialOpt: {
-                vertexShader: Shader.vertex,
-                fragmentShader: Shader.fragment,
-                transparent: true,
-                uniforms: {
-                    uColor: {value: new THREE.Color(this.param.color)}
-                }
+                shader: Shader,
+                attributes: ['aOpacity']
             }
         })
 
-        this.object.setAttribute('position', new Float32Array(position), 3)
-        this.object.setAttribute('aOpacity', new Float32Array(opacity), 1)
+        this.object.setUniform('setColor3', 'uColor', new THREE.Color(this.param.color))
 
-        this.group.add(this.object.get())
-    }
-    createLine2(){
-        const {position, opacity} = this.createAttribute()
-
-        this.object = new Line2({
-            position: position,
-            color: this.param.color,
-            linewidth: this.param.linewidth,
-        })
-
-        this.group.add(this.object.get())
-
-        // console.log(this.object.get().geometry)
+        this.object.setAttribute(this.engine, 'aOpacity', new Float32Array(opacity), 1)
     }
     createAttribute(){
         const {width, height} = this.param
@@ -77,12 +65,12 @@ export default class{
             const x = width * rx - wh
             const y = height * ry - hh
 
-            position.push(x, -y, 0)
+            position.push(new BABYLON.Vector3(x, -y, 0))
             opacity.push(0)
         })
 
-        position.push(position[0], position[1], position[2])
-        opacity.push(0)
+        // position.push(position[0], position[1], position[2])
+        // opacity.push(0)
 
         return {position, opacity}
     }
@@ -91,29 +79,31 @@ export default class{
     // tween
     createTween(){
         const start = {idx: 0}
-        const end = {idx: L.points.length}
+        const end = {idx: L.points.length + 1}
 
         const tw = new TWEEN.Tween(start)
-        .to(end, L.points.length * 2 * 10)
+        .to(end, 3500)
         .onUpdate(() => this.onUpdateTween(start))
         .repeat(Infinity)
         .start()
     }
     onUpdateTween({idx}){
         const opacity = this.object.getAttribute('aOpacity')
-        opacity.array[Math.floor(idx)] = 1
-        opacity.needsUpdate = true
+        const array = opacity.getData()
+        array[Math.floor(idx)] = 1
+        opacity.update(array)
     }
 
 
     // animate
     // animate(){
     //     const opacity = this.object.getAttribute('aOpacity')
+    //     const array = opacity.getData()
 
-    //     for(let i = 0; i < opacity.array.length; i++){
-    //         opacity.array[i] -= 0.005
+    //     for(let i = 0; i < array.length; i++){
+    //         array[i] -= 0.005
     //     }
 
-    //     opacity.needsUpdate = true
+    //     opacity.update(array)
     // }
 }
