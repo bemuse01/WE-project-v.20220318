@@ -1,6 +1,7 @@
 import {LineGeometry} from '../../lib/LineGeometry.js'
 import {LineMaterial} from '../../lib/LineMaterial.js'
 import {Line2} from '../../lib/Line2.js'
+import * as THREE from '../../lib/three.module.js'
 
 export default class{
     constructor({position, materialOpt}){
@@ -50,11 +51,17 @@ export default class{
     getPosition(){
         return this.icosa.position
     }
+    getAttribute(name){
+        return this.mesh.geometry.attributes[name]
+    }
 
 
     // set
     setPositions(array){
         this.mesh.geometry.setPositions(array)
+    }
+    setAttribute(name, array, itemSize){
+        this.mesh.geometry.setAttribute(name, new THREE.BufferAttribute(array, itemSize))
     }
     setUniform(name, value){
         this.mesh.material.uniforms[name].valeu = value

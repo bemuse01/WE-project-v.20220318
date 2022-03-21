@@ -57,6 +57,10 @@ ShaderLib[ 'line' ] = {
 		attribute vec3 instanceColorStart;
 		attribute vec3 instanceColorEnd;
 
+		// custom attributes
+		attribute float aOpacity;
+		varying float vOpacity;
+
 		#ifdef WORLD_UNITS
 
 			varying vec4 worldPos;
@@ -100,6 +104,7 @@ ShaderLib[ 'line' ] = {
 		}
 
 		void main() {
+			vOpacity = aOpacity;
 
 			#ifdef USE_COLOR
 
@@ -273,6 +278,9 @@ ShaderLib[ 'line' ] = {
 
 	fragmentShader:
 	/* glsl */`
+		// custom attributes
+		varying float vOpacity;
+
 		uniform vec3 diffuse;
 		uniform float opacity;
 		uniform float linewidth;
@@ -418,12 +426,12 @@ ShaderLib[ 'line' ] = {
 
 			#endif
 
-			vec4 diffuseColor = vec4( diffuse, alpha );
+			vec4 diffuseColor = vec4( diffuse, alpha);
 
 			#include <logdepthbuf_fragment>
 			#include <color_fragment>
 
-			gl_FragColor = vec4( diffuseColor.rgb, alpha );
+			gl_FragColor = vec4( diffuseColor.rgb, alpha * vOpacity );
 
 			#include <tonemapping_fragment>
 			#include <encodings_fragment>

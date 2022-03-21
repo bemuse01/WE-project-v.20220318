@@ -23,7 +23,7 @@ export default class{
     // init
     init(){
         this.create()
-        // this.createTween()
+        this.createTween()
     }
 
 
@@ -69,7 +69,11 @@ export default class{
             }
         })
 
+        this.object.setAttribute('aOpacity', new Float32Array(opacity), 1)
+
         this.group.add(this.object.get())
+
+        console.log(this.object.get().geometry)
 
         // console.log(this.object.get().geometry)
     }
@@ -92,7 +96,7 @@ export default class{
         })
 
         position.push(position[0], position[1], position[2])
-        opacity.push(0)
+        // opacity.push(0)
 
         return {position, opacity}
     }
@@ -107,7 +111,7 @@ export default class{
         const end = {idx: array.length}
 
         const tw = new TWEEN.Tween(start)
-        .to(end, 3500)
+        .to(end, 5000)
         .onUpdate(() => this.onUpdateTween(array, opacity, start))
         .repeat(Infinity)
         .start()
@@ -127,12 +131,12 @@ export default class{
 
     // animate
     animate(){
-        // const opacity = this.object.getAttribute('aOpacity')
+        const opacity = this.object.getAttribute('aOpacity')
 
-        // for(let i = 0; i < opacity.array.length; i++){
-        //     opacity.array[i] -= 0.005
-        // }
+        for(let i = 0; i < opacity.array.length; i++){
+            opacity.array[i] -= 0.005
+        }
 
-        // opacity.needsUpdate = true
+        opacity.needsUpdate = true
     }
 }
