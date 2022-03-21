@@ -148,7 +148,7 @@ export default class{
         this.camera.aspect = width / height
         this.camera.updateProjectionMatrix()
 
-        this.composer.setSize(width, height)
+        // this.composer.setSize(width, height)
 
         this.size = {
             el: {

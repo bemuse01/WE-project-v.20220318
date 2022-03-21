@@ -3,10 +3,9 @@ import {LineMaterial} from '../../lib/LineMaterial.js'
 import {Line2} from '../../lib/Line2.js'
 
 export default class{
-    constructor({position, color, linewidth}){
-        this.color = color
-        this.linewidth = linewidth
+    constructor({position, materialOpt}){
         this.position = position
+        this.materialOpt = materialOpt
         
         this.init()
     }
@@ -34,16 +33,7 @@ export default class{
         return geometry
     }
     createMaterial(){
-        return new LineMaterial({
-            color: this.color,
-            // vertexColors: true,
-            linewidth: this.linewidth,
-            dashed: false,
-            transparent: true,
-            opacity: 1.0,
-            alphaToCoverage: true,
-            // blending: THREE.AdditiveBlending
-        })
+        return new LineMaterial(this.materialOpt)
     }
 
 
@@ -65,5 +55,8 @@ export default class{
     // set
     setPositions(array){
         this.mesh.geometry.setPositions(array)
+    }
+    setUniform(name, value){
+        this.mesh.material.uniforms[name].valeu = value
     }
 }

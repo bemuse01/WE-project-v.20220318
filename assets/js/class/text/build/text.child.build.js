@@ -13,7 +13,7 @@ export default class{
             width: 2160 * 0.02,
             height: 3840 * 0.02,
             color: 0xffffff,
-            linewidth: 0.01
+            linewidth: 3.5
         }
 
         this.init()
@@ -56,8 +56,17 @@ export default class{
 
         this.object = new Line2({
             position: position,
-            color: this.param.color,
-            linewidth: this.param.linewidth,
+            materialOpt: {
+                color: this.param.color,
+                // vertexColors: true,
+                linewidth: this.param.linewidth,
+                dashed: false,
+                transparent: true,
+                opacity: 1.0,
+                alphaToCoverage: true,
+                resolution: new THREE.Vector2(this.size.el.w, this.size.el.h)
+                // blending: THREE.AdditiveBlending
+            }
         })
 
         this.group.add(this.object.get())
@@ -106,6 +115,13 @@ export default class{
     onUpdateTween(array, opacity, {idx}){
         array[Math.floor(idx)] = 1
         opacity.needsUpdate = true
+    }
+
+
+    // resize
+    resize(size){
+        this.size = size
+        this.object.setUniform('resolution', new THREE.Vector2(size.el.w, size.el.h))
     }
 
 
