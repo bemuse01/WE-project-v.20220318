@@ -73,8 +73,6 @@ export default class{
 
         this.group.add(this.object.get())
 
-        console.log(this.object.get().geometry)
-
         // console.log(this.object.get().geometry)
     }
     createAttribute(){
