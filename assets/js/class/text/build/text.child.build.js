@@ -50,6 +50,8 @@ export default class{
         this.object.setUniform('setColor3', 'uColor', new THREE.Color(this.param.color))
 
         this.object.setAttribute(this.engine, 'aOpacity', new Float32Array(opacity), 1)
+
+        console.log(this.object.get().getVerticesData(BABYLON.VertexBuffer.PositionKind))
     }
     createAttribute(){
         const {width, height} = this.param
