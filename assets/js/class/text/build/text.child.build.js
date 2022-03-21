@@ -16,6 +16,8 @@ export default class{
             linewidth: 3.5
         }
 
+        this.idx = 0
+
         this.init()
     }
 
@@ -23,7 +25,7 @@ export default class{
     // init
     init(){
         this.create()
-        this.createTween()
+        // this.createTween()
     }
 
 
@@ -131,8 +133,12 @@ export default class{
     animate(){
         const opacity = this.object.getAttribute('aOpacity')
 
+        opacity.array[this.idx] = 1
+
+        this.idx = (this.idx + 1) % opacity.array.length
+
         for(let i = 0; i < opacity.array.length; i++){
-            opacity.array[i] -= 0.005
+            opacity.array[i] -= 0.0075
         }
 
         opacity.needsUpdate = true
