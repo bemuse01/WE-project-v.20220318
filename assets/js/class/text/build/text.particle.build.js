@@ -64,7 +64,7 @@ export default class{
         })
 
         this.object.setAttribute('aOpacity', new Float32Array(Array.from({length: this.param.count}, _ => Math.random())), 1)
-        this.object.setAttribute('aPointSize', new Float32Array(Array.from({length: this.param.count}, _ => THREE.Math.randFloat(1, 1.5))), 1)
+        this.object.setAttribute('aPointSize', new Float32Array(Array.from({length: this.param.count}, _ => THREE.Math.randFloat(1, 2))), 1)
         // this.object.delay = Array.from({length: this.param.count}, _ => Math.random() * 2000)
         
         this.object.get().layers.set(PROCESS)
@@ -128,10 +128,11 @@ export default class{
                 // position.array[idx + 1] = currentPosition.y
                 // position.array[idx + 0] = THREE.Math.randFloat(currentPosition.x * 0.95, currentPosition.x * 1.05)
                 // position.array[idx + 1] = THREE.Math.randFloat(currentPosition.y * 0.95, currentPosition.y * 1.05)
+                const pos = Math.random() > 0.2 ? currentPosition : this.position[~~(Math.random() * this.position.length)]
                 const dist = Math.random() * 0.5
                 const theta = Math.random() * 360
-                position.array[idx + 0] = currentPosition.x + Math.cos(theta * RADIAN) * dist
-                position.array[idx + 1] = currentPosition.y + Math.sin(theta * RADIAN) * dist
+                position.array[idx + 0] = pos.x + Math.cos(theta * RADIAN) * dist
+                position.array[idx + 1] = pos.y + Math.sin(theta * RADIAN) * dist
             }
         }
 
