@@ -10,6 +10,7 @@ import {FXAAShader} from '../../postprocess/FXAAShader.js'
 import PublicMethod from '../../method/method.js'
 
 import CHILD from './build/text.child.build.js'
+import PARTICLE from './build/text.particle.build.js'
   
 export default class{
     constructor({app}){
@@ -25,6 +26,7 @@ export default class{
         }
 
         this.modules = {
+            particle: PARTICLE,
             child: CHILD,
         }
         this.group = {}
