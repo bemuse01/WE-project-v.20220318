@@ -10,8 +10,8 @@ export default class{
         this.group = group
 
         this.param = {
-            width: 2160 * 0.02,
-            height: 3840 * 0.02,
+            width: 2160 * 0.015,
+            height: 3840 * 0.015,
             color: 0x936cc6,
             linewidth: 3
         }
@@ -51,6 +51,8 @@ export default class{
         this.object.setAttribute('position', new Float32Array(position), 3)
         this.object.setAttribute('aOpacity', new Float32Array(opacity), 1)
 
+        this.object.get().layers.set(PROCESS)
+
         this.group.add(this.object.get())
     }
     createLine2(){
@@ -76,8 +78,6 @@ export default class{
         this.object.get().layers.set(PROCESS)
 
         this.group.add(this.object.get())
-
-        // console.log(this.object.get().geometry)
     }
     createAttribute(){
         const {width, height} = this.param
@@ -140,7 +140,7 @@ export default class{
         this.idx = (this.idx + 1) % opacity.array.length
 
         for(let i = 0; i < opacity.array.length; i++){
-            opacity.array[i] -= 0.005
+            opacity.array[i] -= 0.006
         }
 
         opacity.needsUpdate = true

@@ -20,14 +20,16 @@ export default class{
             far: 10000,
             pos: 100,
             bloom: 2.5,
-            strength: 6,
-            radius: 0.75,
+            // strength: 3,
+            // radius: 0,
+            strength: 2,
+            radius: 0,
             threshold: 0
         }
 
         this.modules = {
-            particle: PARTICLE,
             child: CHILD,
+            particle: PARTICLE,
         }
         this.group = {}
         this.comp = {}

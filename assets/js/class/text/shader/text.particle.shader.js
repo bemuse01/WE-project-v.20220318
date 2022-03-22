@@ -21,8 +21,9 @@ export default {
         uniform float uOpacity;
 
         void main(){
-            vec4 tex = texture(uTexture, gl_PointCoord);
-            vec4 color = tex * vec4(uColor, vOpacity * uOpacity);
+            // vec4 tex = texture(uTexture, gl_PointCoord);
+            // vec4 color = tex * vec4(uColor, vOpacity * uOpacity);
+            vec4 color = vec4(uColor, vOpacity * uOpacity);
             
             gl_FragColor = color;
         }

@@ -3,17 +3,21 @@ import * as THREE from '../../../lib/three.module.js'
 import Particle from '../../objects/particle.js'
 import Shader from '../shader/text.particle.shader.js'
 
+import PublicMethod from '../../../method/method.js'
+
 export default class{
     constructor({group}){
         this.group = group
         
         this.param = {
-            width: 2160 * 0.02,
-            height: 3840 * 0.02,
+            width: 2160 * 0.015,
+            height: 3840 * 0.015,
             color: 0x936cc6,
-            count: 400,
-            pointSize: 150,
-            opacity: 0.05
+            count: 10000,
+            pointSize: 2,
+            opacity: 0.4,
+            div: 1,
+            rd: 0.5
         }
 
         this.len = L.points.length
@@ -60,7 +64,7 @@ export default class{
         })
 
         this.object.setAttribute('aOpacity', new Float32Array(Array.from({length: this.param.count}, _ => Math.random())), 1)
-        this.object.setAttribute('aPointSize', new Float32Array(Array.from({length: this.param.count}, _ => Math.random() * this.param.pointSize)), 1)
+        this.object.setAttribute('aPointSize', new Float32Array(Array.from({length: this.param.count}, _ => THREE.Math.randFloat(1, 1.5))), 1)
         // this.object.delay = Array.from({length: this.param.count}, _ => Math.random() * 2000)
         
         this.object.get().layers.set(PROCESS)
@@ -89,30 +93,45 @@ export default class{
 
     // animate
     animate(){
-        // const time = window.performance.now()
+        const time = window.performance.now()
         const position = this.object.getAttribute('position')
         const opacity = this.object.getAttribute('aOpacity')
-        const lifeVelocity = this.object.lifeVelocity
-        const positionVelocity = this.object.positionVelocity
+        // const lifeVelocity = this.object.lifeVelocity
+        // const positionVelocity = this.object.positionVelocity
         // const delay = this.object.delay
 
-        const currentPosition = this.position[this.idx]
         this.idx = (this.idx + 1) % this.position.length
+        const currentPosition = this.position[this.idx]
+
+        const div = this.param.count * this.param.div
 
         for(let i = 0; i < this.param.count; i++){
             const idx = i * 3
 
-            position.array[idx + 1] -= positionVelocity[i]
+            const n1 = SIMPLEX.noise2D(i % div * 0.001, time * 0.0005)
+            const n2 = SIMPLEX.noise2D(i % div * 0.002, time * 0.0005)
+            const n4 = SIMPLEX.noise2D(i * 0.003, time * 0.005)
+
+            const nx = n1 * 0.25
+            // const ny = n2 * 0.5
+            const ny = PublicMethod.normalize(n2, -0.5, 0, -1, 1)
+            const no = PublicMethod.normalize(n4, 0, 0.03, -1, 1)
+
+            position.array[idx + 0] += nx
+            position.array[idx + 1] += ny
             
-            // if(delay[i] > time) opacity.array[i] -= lifeVelocity[i]
-            opacity.array[i] -= lifeVelocity[i]
+            opacity.array[i] -= no
 
             if(opacity.array[i] < 0){
                 opacity.array[i] = 1
                 // position.array[idx + 0] = currentPosition.x
                 // position.array[idx + 1] = currentPosition.y
-                position.array[idx + 0] = THREE.Math.randFloat(currentPosition.x * 0.75, currentPosition.x * 1.25)
-                position.array[idx + 1] = THREE.Math.randFloat(currentPosition.y * 0.75, currentPosition.y * 1.25)
+                // position.array[idx + 0] = THREE.Math.randFloat(currentPosition.x * 0.95, currentPosition.x * 1.05)
+                // position.array[idx + 1] = THREE.Math.randFloat(currentPosition.y * 0.95, currentPosition.y * 1.05)
+                const dist = Math.random() * 0.5
+                const theta = Math.random() * 360
+                position.array[idx + 0] = currentPosition.x + Math.cos(theta * RADIAN) * dist
+                position.array[idx + 1] = currentPosition.y + Math.sin(theta * RADIAN) * dist
             }
         }
 
