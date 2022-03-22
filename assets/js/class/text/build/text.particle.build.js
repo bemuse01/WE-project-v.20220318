@@ -10,8 +10,8 @@ export default class{
         this.group = group
         
         this.param = {
-            width: 2160 * 0.015,
-            height: 3840 * 0.015,
+            width: 2250 * 0.015,
+            height: 3000 * 0.015,
             color: 0x936cc6,
             count: 10000,
             pointSize: 2,
