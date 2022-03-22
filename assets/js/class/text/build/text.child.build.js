@@ -12,8 +12,8 @@ export default class{
         this.param = {
             width: 2160 * 0.02,
             height: 3840 * 0.02,
-            color: 0xffffff,
-            linewidth: 3.5
+            color: 0x936cc6,
+            linewidth: 3
         }
 
         this.idx = 0
@@ -72,6 +72,8 @@ export default class{
         })
 
         this.object.setAttribute('aOpacity', new Float32Array(opacity), 1)
+
+        this.object.get().layers.set(PROCESS)
 
         this.group.add(this.object.get())
 
@@ -138,7 +140,7 @@ export default class{
         this.idx = (this.idx + 1) % opacity.array.length
 
         for(let i = 0; i < opacity.array.length; i++){
-            opacity.array[i] -= 0.0075
+            opacity.array[i] -= 0.005
         }
 
         opacity.needsUpdate = true

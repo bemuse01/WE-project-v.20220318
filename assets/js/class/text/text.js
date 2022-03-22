@@ -3,6 +3,7 @@ import {EffectComposer} from '../../postprocess/EffectComposer.js'
 import {FilmPass} from '../../postprocess/FilmPass.js'
 import {RenderPass} from '../../postprocess/RenderPass.js'
 import {BloomPass} from '../../postprocess/BloomPass.js'
+import {UnrealBloomPass} from '../../postprocess/UnrealBloomPass.js'
 import {ShaderPass} from '../../postprocess/ShaderPass.js'
 import {FXAAShader} from '../../postprocess/FXAAShader.js'
 
@@ -17,7 +18,10 @@ export default class{
             near: 0.1,
             far: 10000,
             pos: 100,
-            bloom: 2.5
+            bloom: 2.5,
+            strength: 6,
+            radius: 0.75,
+            threshold: 0
         }
 
         this.modules = {
@@ -35,7 +39,7 @@ export default class{
     init(app){
         this.initGroup()
         this.initRenderObject()
-        // this.initComposer(app)
+        this.initComposer(app)
         this.create(app)
     }
     initGroup(){
@@ -79,7 +83,14 @@ export default class{
 
         const bloomPass = new BloomPass(this.param.bloom)
 
+        const unrealBoomPass = new UnrealBloomPass(new THREE.Vector2(this.size.el.w, this.size.el.h),
+            this.param.strength,
+            this.param.radius,
+            this.param.threshold
+        )
+
         this.composer.addPass(renderPass)
+        this.composer.addPass(unrealBoomPass)
         // this.composer.addPass(bloomPass)
         // this.composer.addPass(filmPass)
         // this.composer.addPass(this.fxaa)
@@ -116,18 +127,18 @@ export default class{
         app.renderer.setScissor(left, bottom, width, height)
         app.renderer.setViewport(left, bottom, width, height)
 
-        this.camera.lookAt(this.scene.position)
-        app.renderer.render(this.scene, this.camera)
-
-        // app.renderer.autoClear = false
-        // app.renderer.clear()
-
-        // this.camera.layers.set(PROCESS)
-        // this.composer.render()
-
-        // app.renderer.clearDepth()
-        // this.camera.layers.set(NORMAL)
+        // this.camera.lookAt(this.scene.position)
         // app.renderer.render(this.scene, this.camera)
+
+        app.renderer.autoClear = false
+        app.renderer.clear()
+
+        this.camera.layers.set(PROCESS)
+        this.composer.render()
+
+        app.renderer.clearDepth()
+        this.camera.layers.set(NORMAL)
+        app.renderer.render(this.scene, this.camera)
     }
     animateObject(app){
         const {renderer} = app
@@ -148,7 +159,7 @@ export default class{
         this.camera.aspect = width / height
         this.camera.updateProjectionMatrix()
 
-        // this.composer.setSize(width, height)
+        this.composer.setSize(width, height)
 
         this.size = {
             el: {
