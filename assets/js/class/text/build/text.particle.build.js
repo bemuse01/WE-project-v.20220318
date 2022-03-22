@@ -6,19 +6,21 @@ import Shader from '../shader/text.particle.shader.js'
 import PublicMethod from '../../../method/method.js'
 
 export default class{
-    constructor({group}){
+    constructor({group, param}){
         this.group = group
         
-        this.param = {
-            width: 2250 * 0.015,
-            height: 3000 * 0.015,
-            color: 0x936cc6,
-            count: 10000,
-            pointSize: 2,
-            opacity: 0.4,
-            div: 1,
-            rd: 0.5
-        }
+        this.param = param
+        
+        // this.param = {
+        //     width: 2250 * 0.015,
+        //     height: 3000 * 0.015,
+        //     color: 0x936cc6,
+        //     count: 10000,
+        //     pointSize: 2,
+        //     opacity: 0.4,
+        //     div: 1,
+        //     rd: 0.5
+        // }
 
         this.len = L.points.length
         this.idx = 0
@@ -37,7 +39,7 @@ export default class{
 
     // create
     create(){
-        const texture = new THREE.TextureLoader().load('assets/src/particle1.png')
+        // const texture = new THREE.TextureLoader().load('assets/src/particle1.png')
 
         this.object = new Particle({
             count: this.param.count,
@@ -55,7 +57,7 @@ export default class{
                 transparent: true,
                 blending: THREE.AdditiveBlending,
                 uniforms: {
-                    uTexture: {value: texture},
+                    // uTexture: {value: texture},
                     uColor: {value: new THREE.Color(this.param.color)},
                     uPointSize: {value: this.param.pointSize},
                     uOpacity: {value: this.param.opacity}

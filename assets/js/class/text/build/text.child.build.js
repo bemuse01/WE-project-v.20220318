@@ -5,16 +5,18 @@ import Shader from '../shader/text.child.shader.js'
 import * as THREE from '../../../lib/three.module.js'
 
 export default class{
-    constructor({group, size}){
+    constructor({group, size, param}){
         this.size = size
         this.group = group
 
-        this.param = {
-            width: 2250 * 0.015,
-            height: 3000 * 0.015,
-            color: 0x936cc6,
-            linewidth: 3
-        }
+        this.param = param
+        // this.param = {
+        //     text: 'LAPLUS',
+        //     width: 2250 * 0.015,
+        //     height: 3000 * 0.015,
+        //     color: 0x936cc6,
+        //     linewidth: 3
+        // }
 
         this.idx = 0
 
@@ -101,26 +103,6 @@ export default class{
         // opacity.push(0)
 
         return {position, opacity}
-    }
-
-
-    // tween
-    createTween(){
-        const opacity = this.object.getAttribute('aOpacity')
-        const array  = opacity.array
-
-        const start = {idx: 0}
-        const end = {idx: array.length}
-
-        const tw = new TWEEN.Tween(start)
-        .to(end, 3500)
-        .onUpdate(() => this.onUpdateTween(array, opacity, start))
-        .repeat(Infinity)
-        .start()
-    }
-    onUpdateTween(array, opacity, {idx}){
-        array[Math.floor(idx)] = 1
-        opacity.needsUpdate = true
     }
 
 

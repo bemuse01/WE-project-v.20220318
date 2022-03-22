@@ -17,7 +17,7 @@ export default {
         varying float vOpacity;
 
         uniform vec3 uColor;
-        uniform sampler2D uTexture;
+        // uniform sampler2D uTexture;
         uniform float uOpacity;
 
         void main(){

@@ -8,6 +8,7 @@ import {ShaderPass} from '../../postprocess/ShaderPass.js'
 import {FXAAShader} from '../../postprocess/FXAAShader.js'
 
 import PublicMethod from '../../method/method.js'
+import Data from '../../data/data.js'
 
 import CHILD from './build/text.child.build.js'
 import PARTICLE from './build/text.particle.build.js'
@@ -24,27 +25,30 @@ export default class{
             // radius: 0,
             strength: 2,
             radius: 0,
-            threshold: 0
+            threshold: 0,
+            text: 'LAPLUS'.split().map((text, id) => ({id, text}))
         }
 
         this.modules = {
-            child: CHILD,
-            particle: PARTICLE,
+            // child: CHILD,
+            // particle: PARTICLE,
         }
         this.group = {}
         this.comp = {}
         this.build = new THREE.Group()
+        
+        this.renderer = app.renderer
 
-        this.init(app)
+        this.init()
     }
 
 
     // init
-    init(app){
-        this.initGroup()
+    init(){
+        // this.initGroup()
         this.initRenderObject()
-        this.initComposer(app)
-        this.create(app)
+        this.initComposer()
+        this.create()
     }
     initGroup(){
         for(const module in this.modules){
@@ -73,12 +77,12 @@ export default class{
             }
         }
     }
-    initComposer(app){
+    initComposer(){
         const {right, left, bottom, top} = this.element.getBoundingClientRect()
         const width = right - left
         const height = bottom - top
         
-        this.composer = new EffectComposer(app.renderer)
+        this.composer = new EffectComposer(this.renderer)
         this.composer.setSize(width, height)
 
         const renderPass = new RenderPass(this.scene, this.camera)
@@ -102,24 +106,54 @@ export default class{
 
 
     // create
-    create({renderer}){
-        for(const module in this.modules){
-            const instance = this.modules[module]
-            const group = this.group[module]
-
-            this.comp[module] = new instance({group, size: this.size, ...this.comp})
-        }
+    create(){
+     
 
         for(const group in this.group) this.build.add(this.group[group])
         
         this.scene.add(this.build)
     }
+    createInstance(){
+        // for(const module in this.modules){
+        //     const instance = this.modules[module]
+        //     const group = this.group[module]
+
+        //     this.comp[module] = new instance({group, size: this.size, ...this.comp})
+        // }
+        this.param.text.forEach(e => {
+            const {id, text} = e
+            
+            const particleName = text + id + 'Particle'
+            const childName = text + id + 'Child'
+
+            this.group[particleName] = new THREE.Group()
+            this.group[childName] = new THREE.Group()
+
+            const data = Data[text]
+
+            this.comp[particleName] = new PARTICLE({
+                group: this.group[particleName],
+                size: this.size,
+                param: {
+                    width: 2250 * 0.015,
+                    height: 3000 * 0.015,
+                    color: 0x936cc6,
+                    count: 10000,
+                    pointSize: 2,
+                    opacity: 0.4,
+                    div: 1,
+                    rd: 0.5
+                }
+            })
+            this.comp[childName]
+        })
+    }
 
 
     // animate
-    animate({app, audio}){
-        this.render(app)
-        this.animateObject(app, audio)
+    animate(){
+        this.render()
+        this.animateObject()
     }
     render(app){
         const rect = this.element.getBoundingClientRect()
@@ -128,28 +162,26 @@ export default class{
         const left = rect.left
         const bottom = app.renderer.domElement.clientHeight - rect.bottom
 
-        app.renderer.setScissor(left, bottom, width, height)
-        app.renderer.setViewport(left, bottom, width, height)
+        this.renderer.setScissor(left, bottom, width, height)
+        this.renderer.setViewport(left, bottom, width, height)
 
         // this.camera.lookAt(this.scene.position)
         // app.renderer.render(this.scene, this.camera)
 
-        app.renderer.autoClear = false
-        app.renderer.clear()
+        this.renderer.autoClear = false
+        this.renderer.clear()
 
         this.camera.layers.set(PROCESS)
         this.composer.render()
 
-        app.renderer.clearDepth()
+        this.renderer.clearDepth()
         this.camera.layers.set(NORMAL)
-        app.renderer.render(this.scene, this.camera)
+        this.renderer.render(this.scene, this.camera)
     }
-    animateObject(app){
-        const {renderer} = app
-
-        for(let i in this.comp){
-            if(!this.comp[i] || !this.comp[i].animate) continue
-            this.comp[i].animate({renderer})
+    animateObject(){
+        for(const comp in this.comp){
+            if(!this.comp[comp] || !this.comp[comp].animate) continue
+            this.comp[comp].animate({renderer: this.renderer})
         }
     }
 
@@ -179,9 +211,9 @@ export default class{
         this.resizeObject()
     }
     resizeObject(){
-        for(let i in this.comp){
-            if(!this.comp[i] || !this.comp[i].resize) continue
-            this.comp[i].resize(this.size)
+        for(const comp in this.comp){
+            if(!this.comp[comp] || !this.comp[comp].resize) continue
+            this.comp[comp].resize(this.size)
         }
     }
 }
