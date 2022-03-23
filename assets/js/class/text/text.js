@@ -23,12 +23,12 @@ export default class{
             bloom: 2.5,
             // strength: 3,
             // radius: 0,
-            strength: 2,
-            radius: 0,
+            strength: 4,
+            radius: 0.5,
             threshold: 0,
             // text: 'LAPLUS'.split('').map((text, id) => ({id, text}))
             text: 'LAPLUS'.split('').map((text, id) => ({id, text})),
-            rd: 0.0125
+            rd: 0.01
         }
 
         this.modules = {
@@ -83,8 +83,11 @@ export default class{
         const {right, left, bottom, top} = this.element.getBoundingClientRect()
         const width = right - left
         const height = bottom - top
+
+        const renderTarget = new THREE.WebGLRenderTarget(width, height, {format: THREE.RGBAFormat})
+        renderTarget.samples = 2048
         
-        this.composer = new EffectComposer(this.renderer)
+        this.composer = new EffectComposer(this.renderer, renderTarget)
         this.composer.setSize(width, height)
 
         const renderPass = new RenderPass(this.scene, this.camera)
