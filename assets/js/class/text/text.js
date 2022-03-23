@@ -26,7 +26,8 @@ export default class{
             strength: 2,
             radius: 0,
             threshold: 0,
-            text: 'LAPLUS'.split().map((text, id) => ({id, text}))
+            // text: 'LAPLUS'.split('').map((text, id) => ({id, text}))
+            text: 'L'.split('').map((text, id) => ({id, text}))
         }
 
         this.modules = {
@@ -107,7 +108,7 @@ export default class{
 
     // create
     create(){
-     
+        this.createInstance()
 
         for(const group in this.group) this.build.add(this.group[group])
         
@@ -130,23 +131,48 @@ export default class{
             this.group[childName] = new THREE.Group()
 
             const data = Data[text]
+            console.log(data)
 
-            this.comp[particleName] = new PARTICLE({
-                group: this.group[particleName],
+            // this.comp[particleName] = new PARTICLE({
+            //     group: this.group[particleName],
+            //     size: this.size,
+            //     param: {
+            //         width: 2250 * 0.015,
+            //         height: 3000 * 0.015,
+            //         color: 0x936cc6,
+            //         count: 10000,
+            //         pointSize: 2,
+            //         opacity: 0.4,
+            //         div: 1,
+            //         rd: 0.5
+            //     },
+            //     data
+            // })
+            this.comp[childName] = new CHILD({
+                group: this.group[childName],
                 size: this.size,
                 param: {
-                    width: 2250 * 0.015,
-                    height: 3000 * 0.015,
                     color: 0x936cc6,
-                    count: 10000,
-                    pointSize: 2,
-                    opacity: 0.4,
-                    div: 1,
-                    rd: 0.5
-                }
+                    linewidth: 3,
+                    w: 0.01,
+                    h: 0.01,
+                },
+                data
             })
-            this.comp[childName]
+
+
+            const {w} = data
+            const fw = w * this.param.text.length
+            const x = w * id - fw / 2
+
+            this.group[childName].position.x = x
         })
+    }
+
+
+    // set
+    setGroupTransform(){
+
     }
 
 
@@ -160,7 +186,7 @@ export default class{
         const width = rect.right - rect.left
         const height = rect.bottom - rect.top
         const left = rect.left
-        const bottom = app.renderer.domElement.clientHeight - rect.bottom
+        const bottom = this.renderer.domElement.clientHeight - rect.bottom
 
         this.renderer.setScissor(left, bottom, width, height)
         this.renderer.setViewport(left, bottom, width, height)

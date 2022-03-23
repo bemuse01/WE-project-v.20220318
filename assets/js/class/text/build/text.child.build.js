@@ -5,20 +5,19 @@ import Shader from '../shader/text.child.shader.js'
 import * as THREE from '../../../lib/three.module.js'
 
 export default class{
-    constructor({group, size, param}){
+    constructor({group, size, param, data}){
         this.size = size
         this.group = group
-
         this.param = param
-        // this.param = {
-        //     text: 'LAPLUS',
-        //     width: 2250 * 0.015,
-        //     height: 3000 * 0.015,
-        //     color: 0x936cc6,
-        //     linewidth: 3
-        // }
+        this.data = data
 
-        this.idx = 0
+        const {w, h} = this.data
+        this.width = w * this.param.w
+        this.height = h * this.param.h
+
+        this.len = this.data.shapes.length
+        this.object = []
+        this.idx = Array.from({length: this.len}, _ => 0)
 
         this.init()
     }
@@ -27,40 +26,19 @@ export default class{
     // init
     init(){
         this.create()
-        // this.createTween()
     }
 
 
     // create
     create(){
-        // this.createLine()
-        this.createLine2()
+        for(let i = 0; i < this.len; i++){
+            this.createLine2(i)
+        }
     }
-    createLine(){
-        const {position, opacity} = this.createAttribute()
+    createLine2(idx){
+        const {position, opacity} = this.createAttribute(idx)
 
-        this.object = new Line({
-            materialOpt: {
-                vertexShader: Shader.vertex,
-                fragmentShader: Shader.fragment,
-                transparent: true,
-                uniforms: {
-                    uColor: {value: new THREE.Color(this.param.color)}
-                }
-            }
-        })
-
-        this.object.setAttribute('position', new Float32Array(position), 3)
-        this.object.setAttribute('aOpacity', new Float32Array(opacity), 1)
-
-        this.object.get().layers.set(PROCESS)
-
-        this.group.add(this.object.get())
-    }
-    createLine2(){
-        const {position, opacity} = this.createAttribute()
-
-        this.object = new Line2({
+        this.object[idx] = new Line2({
             position: position,
             materialOpt: {
                 color: this.param.color,
@@ -75,25 +53,24 @@ export default class{
             }
         })
 
-        this.object.setAttribute('aOpacity', new Float32Array(opacity), 1)
+        this.object[idx].setAttribute('aOpacity', new Float32Array(opacity), 1)
 
-        this.object.get().layers.set(PROCESS)
+        this.object[idx].get().layers.set(PROCESS)
 
-        this.group.add(this.object.get())
+        this.group.add(this.object[idx].get())
     }
-    createAttribute(){
-        const {width, height} = this.param
+    createAttribute(idx){
         const position = []
         const opacity = []
 
-        const wh = width / 2
-        const hh = height / 2
+        const wh = this.width / 2
+        const hh = this.height / 2
 
-        L.points.forEach((e, i, a) => {
+        this.data.shapes[idx]['points'].forEach((e, i, a) => {
             const {rx, ry} = e
 
-            const x = width * rx - wh
-            const y = height * ry - hh
+            const x = this.width * rx - wh
+            const y = this.height * ry - hh
 
             position.push(x, -y, 0)
             opacity.push(0)
@@ -109,22 +86,27 @@ export default class{
     // resize
     resize(size){
         this.size = size
-        this.object.setUniform('resolution', new THREE.Vector2(size.el.w, size.el.h))
+        
+        for(let i = 0; i < this.len; i++){
+            this.object[i].setUniform('resolution', new THREE.Vector2(size.el.w, size.el.h))
+        }
     }
 
 
     // animate
     animate(){
-        const opacity = this.object.getAttribute('aOpacity')
+        for(let i = 0; i < this.len; i++){
+            const opacity = this.object[i].getAttribute('aOpacity')
 
-        opacity.array[this.idx] = 1
-
-        this.idx = (this.idx + 1) % opacity.array.length
-
-        for(let i = 0; i < opacity.array.length; i++){
-            opacity.array[i] -= 0.006
+            opacity.array[this.idx[i]] = 1
+    
+            this.idx[i] = (this.idx[i] + 1) % opacity.array.length
+    
+            for(let i = 0; i < opacity.array.length; i++){
+                opacity.array[i] -= 0.006
+            }
+    
+            opacity.needsUpdate = true
         }
-
-        opacity.needsUpdate = true
     }
 }

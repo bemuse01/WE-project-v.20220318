@@ -6,10 +6,10 @@ import Shader from '../shader/text.particle.shader.js'
 import PublicMethod from '../../../method/method.js'
 
 export default class{
-    constructor({group, param}){
+    constructor({group, param, data}){
         this.group = group
-        
         this.param = param
+        this.data = data
         
         // this.param = {
         //     width: 2250 * 0.015,
