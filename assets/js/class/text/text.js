@@ -27,7 +27,7 @@ export default class{
             radius: 0,
             threshold: 0,
             // text: 'LAPLUS'.split('').map((text, id) => ({id, text}))
-            text: 'LALA'.split('').map((text, id) => ({id, text})),
+            text: 'LAPLUS'.split('').map((text, id) => ({id, text})),
             rd: 0.01
         }
 
