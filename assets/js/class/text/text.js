@@ -28,7 +28,7 @@ export default class{
             threshold: 0,
             // text: 'LAPLUS'.split('').map((text, id) => ({id, text}))
             text: 'LAPLUS'.split('').map((text, id) => ({id, text})),
-            rd: 0.01
+            rd: 0.0125
         }
 
         this.modules = {
