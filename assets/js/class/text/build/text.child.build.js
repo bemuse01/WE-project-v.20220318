@@ -18,6 +18,10 @@ export default class{
         this.len = this.data.shapes.length
         this.object = []
         this.idx = Array.from({length: this.len}, _ => 0)
+        // this.reduce = Array.from(this.data.shapes, e => THREE.Math.clamp(e['points'].length * 0.00005, 0.0125, 0.003))
+        this.reduce = Array.from(this.data.shapes, e => THREE.Math.lerp(0.006, 0.02, THREE.Math.clamp(1 - e['points'].length * 0.01, 0, 1.0)))
+
+        // console.log(this.reduce)
 
         this.init()
     }
@@ -102,8 +106,8 @@ export default class{
     
             this.idx[i] = (this.idx[i] + 1) % opacity.array.length
     
-            for(let i = 0; i < opacity.array.length; i++){
-                opacity.array[i] -= 0.006
+            for(let j = 0; j < opacity.array.length; j++){
+                opacity.array[j] -= this.reduce[i]
             }
     
             opacity.needsUpdate = true
