@@ -130,21 +130,20 @@ export default class{
 
             const data = Data[text]
 
-            // this.comp[particleName] = new PARTICLE({
-            //     group: this.group[particleName],
-            //     size: this.size,
-            //     param: {
-            //         width: 2250 * 0.015,
-            //         height: 3000 * 0.015,
-            //         color: 0x936cc6,
-            //         count: 10000,
-            //         pointSize: 2,
-            //         opacity: 0.4,
-            //         div: 1,
-            //         rd: 0.5
-            //     },
-            //     data
-            // })
+            this.comp[particleName] = new PARTICLE({
+                group: this.group[particleName],
+                size: this.size,
+                param: {
+                    w: this.param.rd,
+                    h: this.param.rd,
+                    color: 0x936cc6,
+                    pointSize: 2,
+                    opacity: 0.4,
+                    div: 1,
+                    rd: 0.5
+                },
+                data
+            })
             this.comp[childName] = new CHILD({
                 group: this.group[childName],
                 size: this.size,
@@ -163,6 +162,7 @@ export default class{
             const x = previousWidth + wh
 
             this.group[childName].position.x = x
+            this.group[particleName].position.x = x
         })
     }
 
