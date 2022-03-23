@@ -27,7 +27,8 @@ export default class{
             radius: 0,
             threshold: 0,
             // text: 'LAPLUS'.split('').map((text, id) => ({id, text}))
-            text: 'L'.split('').map((text, id) => ({id, text}))
+            text: 'LALA'.split('').map((text, id) => ({id, text})),
+            rd: 0.01
         }
 
         this.modules = {
@@ -112,15 +113,12 @@ export default class{
 
         for(const group in this.group) this.build.add(this.group[group])
         
+        const fwh = this.param.text.map(e => Data[e.text].w * this.param.rd).reduce((pre, cur) => pre + cur) / 2
+        this.build.position.x = -fwh
+
         this.scene.add(this.build)
     }
     createInstance(){
-        // for(const module in this.modules){
-        //     const instance = this.modules[module]
-        //     const group = this.group[module]
-
-        //     this.comp[module] = new instance({group, size: this.size, ...this.comp})
-        // }
         this.param.text.forEach(e => {
             const {id, text} = e
             
@@ -131,7 +129,6 @@ export default class{
             this.group[childName] = new THREE.Group()
 
             const data = Data[text]
-            console.log(data)
 
             // this.comp[particleName] = new PARTICLE({
             //     group: this.group[particleName],
@@ -154,16 +151,16 @@ export default class{
                 param: {
                     color: 0x936cc6,
                     linewidth: 3,
-                    w: 0.01,
-                    h: 0.01,
+                    w: this.param.rd,
+                    h: this.param.rd,
                 },
                 data
             })
 
-
-            const {w} = data
-            const fw = w * this.param.text.length
-            const x = w * id - fw / 2
+            const previousWidth = id === 0 ? 0 : this.param.text.slice(0, id).map(e => Data[e.text].w * this.param.rd).reduce((pre, cur) => pre + cur)
+            const width = data.w * this.param.rd
+            const wh = width / 2
+            const x = previousWidth + wh
 
             this.group[childName].position.x = x
         })
