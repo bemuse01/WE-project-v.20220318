@@ -26,8 +26,7 @@ export default class{
             strength: 6,
             radius: 0.6,
             threshold: 0,
-            // text: 'LAPLUS'.split('').map((text, id) => ({id, text}))
-            text: 'WHDGODI'.split('').map((text, id) => ({id, text})),
+            text: 'LAPLUS'.split('').map((text, id) => ({id, text})),
             rd: 0.01
         }
 
