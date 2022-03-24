@@ -126,7 +126,7 @@ export default class{
 
                 if(opacity.array[j] < 0){
                     opacity.array[j] = 1
-                    const npos = Math.random() > 0.125 ? currentPosition : pos[~~(Math.random() * pos.length)]
+                    const npos = Math.random() > 0.3 ? currentPosition : pos[~~(Math.random() * pos.length)]
                     const dist = Math.random() * 0.5
                     const theta = Math.random() * 360
                     position.array[index + 0] = npos.x + Math.cos(theta * RADIAN) * dist

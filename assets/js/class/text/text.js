@@ -23,8 +23,8 @@ export default class{
             bloom: 2.5,
             // strength: 3,
             // radius: 0,
-            strength: 4,
-            radius: 0.5,
+            strength: 6,
+            radius: 0.6,
             threshold: 0,
             // text: 'LAPLUS'.split('').map((text, id) => ({id, text}))
             text: 'LAPLUS'.split('').map((text, id) => ({id, text})),
@@ -152,7 +152,7 @@ export default class{
                 size: this.size,
                 param: {
                     color: 0x936cc6,
-                    linewidth: 3,
+                    linewidth: 2,
                     w: this.param.rd,
                     h: this.param.rd,
                 },
