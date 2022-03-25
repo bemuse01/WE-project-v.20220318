@@ -107,64 +107,15 @@ export default {
             }
         `
     },
-    createRing(){
+    cubicBezier(){
         return `
-            float ring(vec2 coords, vec2 center, float radius, float thickness, float blur){
-                float calculatedRadius = length(coords - center);
-                float innerRadius = radius - thickness;
-            
-                float pctOuterCircle = 1.0 - smoothstep(radius - blur, radius, calculatedRadius);
-                float outerCirclePaint = mix(0.0, 1.0, pctOuterCircle);
-                
-                float pctInnerCircle = 1.0 - smoothstep(innerRadius - blur, innerRadius, calculatedRadius);
-                float innerCirclePaint = mix(outerCirclePaint, 0.0, pctInnerCircle);
-            
-                return innerCirclePaint;
-            }
-        `
-    },
-    blur13(){
-        return `
-            vec4 blur13(sampler2D image, vec2 uv, vec2 resolution, vec2 direction) {
-                vec4 color = vec4(0.0);
-                vec2 off1 = vec2(1.411764705882353) * direction;
-                vec2 off2 = vec2(3.2941176470588234) * direction;
-                vec2 off3 = vec2(5.176470588235294) * direction;
-                color += texture2D(image, uv) * 0.1964825501511404;
-                color += texture2D(image, uv + (off1 / resolution)) * 0.2969069646728344;
-                color += texture2D(image, uv - (off1 / resolution)) * 0.2969069646728344;
-                color += texture2D(image, uv + (off2 / resolution)) * 0.09447039785044732;
-                color += texture2D(image, uv - (off2 / resolution)) * 0.09447039785044732;
-                color += texture2D(image, uv + (off3 / resolution)) * 0.010381362401148057;
-                color += texture2D(image, uv - (off3 / resolution)) * 0.010381362401148057;
-                return color;
-            }
-        `
-    },
-    blur9(){
-        return `
-            vec4 blur9(sampler2D image, vec2 uv, vec2 resolution, vec2 direction) {
-                vec4 color = vec4(0.0);
-                vec2 off1 = vec2(1.3846153846) * direction;
-                vec2 off2 = vec2(3.2307692308) * direction;
-                color += texture2D(image, uv) * 0.2270270270;
-                color += texture2D(image, uv + (off1 / resolution)) * 0.3162162162;
-                color += texture2D(image, uv - (off1 / resolution)) * 0.3162162162;
-                color += texture2D(image, uv + (off2 / resolution)) * 0.0702702703;
-                color += texture2D(image, uv - (off2 / resolution)) * 0.0702702703;
-                return color;
-            }
-        `
-    },
-    blur5(){
-        return `
-            vec4 blur5(sampler2D image, vec2 uv, vec2 resolution, vec2 direction) {
-                vec4 color = vec4(0.0);
-                vec2 off1 = vec2(1.3333333333333333) * direction;
-                color += texture2D(image, uv) * 0.29411764705882354;
-                color += texture2D(image, uv + (off1 / resolution)) * 0.35294117647058826;
-                color += texture2D(image, uv - (off1 / resolution)) * 0.35294117647058826;
-                return color; 
+            vec3 cubicBezier(vec3 p0, vec3 c0, vec3 c1, vec3 p1, float t){
+                float tn = 1.0 - t;
+                return 
+                    tn * tn * tn * p0 + 
+                    3.0 * tn * tn * t * c0 + 
+                    3.0 * tn * t * t * c1 + 
+                    t * t * t * p1;
             }
         `
     },
@@ -248,6 +199,82 @@ export default {
                 m1 = m1 * m1;
                 return 49.0 * ( dot(m0*m0, vec3( dot( p0, x0 ), dot( p1, x1 ), dot( p2, x2 )))
                             + dot(m1*m1, vec2( dot( p3, x3 ), dot( p4, x4 ) ) ) ) ;
+            }
+        `
+    },
+    noise3D(){
+        return `
+            float mod289(float x){return x - floor(x * (1.0 / 289.0)) * 289.0;}
+            vec4 mod289(vec4 x){return x - floor(x * (1.0 / 289.0)) * 289.0;}
+            vec4 perm(vec4 x){return mod289(((x * 34.0) + 1.0) * x);}
+            
+            float noise3D(vec3 p){
+                vec3 a = floor(p);
+                vec3 d = p - a;
+                d = d * d * (3.0 - 2.0 * d);
+            
+                vec4 b = a.xxyy + vec4(0.0, 1.0, 0.0, 1.0);
+                vec4 k1 = perm(b.xyxy);
+                vec4 k2 = perm(k1.xyxy + b.zzww);
+            
+                vec4 c = k2 + a.zzzz;
+                vec4 k3 = perm(c);
+                vec4 k4 = perm(c + 1.0);
+            
+                vec4 o1 = fract(k3 * (1.0 / 41.0));
+                vec4 o2 = fract(k4 * (1.0 / 41.0));
+            
+                vec4 o3 = o2 * d.z + o1 * (1.0 - d.z);
+                vec2 o4 = o3.yw * d.x + o3.xz * (1.0 - d.x);
+            
+                return o4.y * d.y + o4.x * (1.0 - d.y);
+            }
+        `
+    },
+    caustics(){
+        return `
+            float h12(vec2 p){return fract(sin(dot(p,vec2(32.52554,45.5634)))*12432.2355);}
+            float n12(vec2 p){
+                vec2 i = floor(p);
+                vec2 f = fract(p);
+                f *= f * (3.-2.*f);
+                return mix(
+                    mix(h12(i+vec2(0.,0.)),h12(i+vec2(1.,0.)),f.x),
+                    mix(h12(i+vec2(0.,1.)),h12(i+vec2(1.,1.)),f.x),
+                    f.y
+                );
+            }
+            
+            float caustics(vec2 p, float t){
+                vec3 k = vec3(p,t);
+                float l;
+                mat3 m = mat3(-2,-1,2,3,-2,1,1,2,2);
+                float n = n12(p);
+                k = k*m*.5;
+                l = length(.5 - fract(k+n));
+                k = k*m*.4;
+                l = min(l, length(.5-fract(k+n)));
+                k = k*m*.3;
+                l = min(l, length(.5-fract(k+n)));
+                return pow(l,7.)*25.;
+            }
+        `
+    },
+    turbulence(){
+        return `
+            #define OCTAVES 6
+            float fbm (in vec3 p) {
+                float value = 0.0;
+                float amplitude = .5;
+                float frequency = 0.;
+
+                for (int i = 0; i < OCTAVES; i++) {
+                    // value += amplitude * abs(snoise3D(p));
+                    value += amplitude * snoise3D(p);
+                    p *= 2.;
+                    amplitude *= .5;
+                }
+                return value;
             }
         `
     }

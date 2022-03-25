@@ -13,6 +13,7 @@ import {
 import { Pass, FullScreenQuad } from './Pass.js';
 import { CopyShader } from './CopyShader.js';
 import { LuminosityHighPassShader } from './LuminosityHighPassShader.js';
+import ShaderMethod from '../method/method.shader.js'
 
 /**
  * UnrealBloomPass is inspired by the bloom pass of Unreal Engine. It creates a
@@ -119,6 +120,8 @@ class UnrealBloomPass extends Pass {
 		this.compositeMaterial.uniforms[ 'blurTexture5' ].value = this.renderTargetsVertical[ 4 ].texture;
 		this.compositeMaterial.uniforms[ 'bloomStrength' ].value = strength;
 		this.compositeMaterial.uniforms[ 'bloomRadius' ].value = 0.1;
+		this.compositeMaterial.uniforms[ 'time' ].value = 0;
+		this.compositeMaterial.uniforms[ 'resolution' ].value = this.resolution;
 		this.compositeMaterial.needsUpdate = true;
 
 		const bloomFactors = [ 1.0, 0.8, 0.6, 0.4, 0.2 ];
@@ -200,6 +203,7 @@ class UnrealBloomPass extends Pass {
 	}
 
 	render( renderer, writeBuffer, readBuffer, deltaTime, maskActive ) {
+		this.compositeMaterial.uniforms[ 'time' ].value = window.performance.now();
 
 		renderer.getClearColor( this._oldClearColor );
 		this.oldClearAlpha = renderer.getClearAlpha();
@@ -364,7 +368,9 @@ class UnrealBloomPass extends Pass {
 				'bloomStrength': { value: 1.0 },
 				'bloomFactors': { value: null },
 				'bloomTintColors': { value: null },
-				'bloomRadius': { value: 0.0 }
+				'bloomRadius': { value: 0.0 },
+				'time': { value: 0.0 },
+				'resolution': { value: 0.0 }
 			},
 
 			vertexShader:
@@ -386,18 +392,28 @@ class UnrealBloomPass extends Pass {
 				uniform float bloomRadius;
 				uniform float bloomFactors[NUM_MIPS];
 				uniform vec3 bloomTintColors[NUM_MIPS];
+				uniform float time;
+				uniform vec2 resolution;
 
 				float lerpBloomFactor(const in float factor) {
 					float mirrorFactor = 1.2 - factor;
 					return mix(factor, mirrorFactor, bloomRadius);
 				}
 
+				${ShaderMethod.snoise3D()}
+				${ShaderMethod.turbulence()}
+
 				void main() {
-					gl_FragColor = bloomStrength * ( lerpBloomFactor(bloomFactors[0]) * vec4(bloomTintColors[0], 1.0) * texture2D(blurTexture1, vUv) +
-						lerpBloomFactor(bloomFactors[1]) * vec4(bloomTintColors[1], 1.0) * texture2D(blurTexture2, vUv) +
-						lerpBloomFactor(bloomFactors[2]) * vec4(bloomTintColors[2], 1.0) * texture2D(blurTexture3, vUv) +
-						lerpBloomFactor(bloomFactors[3]) * vec4(bloomTintColors[3], 1.0) * texture2D(blurTexture4, vUv) +
-						lerpBloomFactor(bloomFactors[4]) * vec4(bloomTintColors[4], 1.0) * texture2D(blurTexture5, vUv) );
+					vec2 st = vUv;
+					st.x *= resolution.x / resolution.y;
+		
+					float t = fbm(vec3(st * 50.0, time * 0.0005)) * 0.005;
+
+					gl_FragColor = bloomStrength * ( lerpBloomFactor(bloomFactors[0]) * vec4(bloomTintColors[0], 1.0) * texture2D(blurTexture1, vUv + t) +
+						lerpBloomFactor(bloomFactors[1]) * vec4(bloomTintColors[1], 1.0) * texture2D(blurTexture2, vUv + t) +
+						lerpBloomFactor(bloomFactors[2]) * vec4(bloomTintColors[2], 1.0) * texture2D(blurTexture3, vUv + t) +
+						lerpBloomFactor(bloomFactors[3]) * vec4(bloomTintColors[3], 1.0) * texture2D(blurTexture4, vUv + t) +
+						lerpBloomFactor(bloomFactors[4]) * vec4(bloomTintColors[4], 1.0) * texture2D(blurTexture5, vUv + t) );
 				}`
 		} );
 

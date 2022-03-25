@@ -1,11 +1,9 @@
 import * as THREE from '../../lib/three.module.js'
 import {EffectComposer} from '../../postprocess/EffectComposer.js'
-import {FilmPass} from '../../postprocess/FilmPass.js'
 import {RenderPass} from '../../postprocess/RenderPass.js'
-import {BloomPass} from '../../postprocess/BloomPass.js'
 import {UnrealBloomPass} from '../../postprocess/UnrealBloomPass.js'
 import {ShaderPass} from '../../postprocess/ShaderPass.js'
-import {FXAAShader} from '../../postprocess/FXAAShader.js'
+import {TurbulenceShader} from '../../postprocess/TurbulenceShader.js'
 
 import PublicMethod from '../../method/method.js'
 import Data from '../../data/data.js'
@@ -23,8 +21,8 @@ export default class{
             bloom: 2.5,
             // strength: 3,
             // radius: 0,
-            strength: 6,
-            radius: 0.6,
+            strength: 8,
+            radius: 0.5,
             threshold: 0,
             text: 'LAPLUS'.split('').map((text, id) => ({id, text})),
             rd: 0.01
@@ -91,21 +89,19 @@ export default class{
 
         const renderPass = new RenderPass(this.scene, this.camera)
 
-        const filmPass = new FilmPass(0, 0, 0, false)
-
-        const bloomPass = new BloomPass(this.param.bloom)
-
         const unrealBoomPass = new UnrealBloomPass(new THREE.Vector2(this.size.el.w, this.size.el.h),
             this.param.strength,
             this.param.radius,
             this.param.threshold
         )
 
+        this.turbulencePass = new ShaderPass(TurbulenceShader)
+        this.turbulencePass.uniforms.tDiffuse.value = unrealBoomPass.renderTargetsHorizontal.texture
+        this.turbulencePass.uniforms.resolution.value = new THREE.Vector2(width, height)
+
         this.composer.addPass(renderPass)
         this.composer.addPass(unrealBoomPass)
-        // this.composer.addPass(bloomPass)
-        // this.composer.addPass(filmPass)
-        // this.composer.addPass(this.fxaa)
+        // this.composer.addPass(this.turbulencePass)
     }
 
 
@@ -132,26 +128,26 @@ export default class{
 
             const data = Data[text]
 
-            this.comp[particleName] = new PARTICLE({
-                group: this.group[particleName],
-                size: this.size,
-                param: {
-                    w: this.param.rd,
-                    h: this.param.rd,
-                    color: 0x936cc6,
-                    pointSize: 2,
-                    opacity: 0.4,
-                    div: 1,
-                    rd: 0.5
-                },
-                data
-            })
+            // this.comp[particleName] = new PARTICLE({
+            //     group: this.group[particleName],
+            //     size: this.size,
+            //     param: {
+            //         w: this.param.rd,
+            //         h: this.param.rd,
+            //         color: 0x936cc6,
+            //         pointSize: 2,
+            //         opacity: 0.4,
+            //         div: 1,
+            //         rd: 0.5
+            //     },
+            //     data
+            // })
             this.comp[childName] = new CHILD({
                 group: this.group[childName],
                 size: this.size,
                 param: {
                     color: 0x936cc6,
-                    linewidth: 2,
+                    linewidth: 4,
                     w: this.param.rd,
                     h: this.param.rd,
                 },
@@ -190,6 +186,8 @@ export default class{
         this.renderer.setScissor(left, bottom, width, height)
         this.renderer.setViewport(left, bottom, width, height)
 
+        this.turbulencePass.uniforms.time.value = window.performance.now()
+
         // this.camera.lookAt(this.scene.position)
         // app.renderer.render(this.scene, this.camera)
 
@@ -221,6 +219,7 @@ export default class{
         this.camera.updateProjectionMatrix()
 
         this.composer.setSize(width, height)
+        this.turbulencePass.uniforms.resolution.value = new THREE.Vector2(width, height)
 
         this.size = {
             el: {
