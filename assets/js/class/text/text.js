@@ -21,7 +21,7 @@ export default class{
             bloom: 2.5,
             // strength: 3,
             // radius: 0,
-            strength: 8,
+            strength: 9,
             radius: 0.5,
             threshold: 0,
             text: 'LAPLUS'.split('').map((text, id) => ({id, text})),

@@ -407,7 +407,7 @@ class UnrealBloomPass extends Pass {
 					vec2 st = vUv;
 					st.x *= resolution.x / resolution.y;
 		
-					float t = fbm(vec3(st * 50.0, time * 0.0005)) * 0.005;
+					float t = fbm(vec3(st * 20.0, time * 0.0005)) * 0.004;
 
 					gl_FragColor = bloomStrength * ( lerpBloomFactor(bloomFactors[0]) * vec4(bloomTintColors[0], 1.0) * texture2D(blurTexture1, vUv + t) +
 						lerpBloomFactor(bloomFactors[1]) * vec4(bloomTintColors[1], 1.0) * texture2D(blurTexture2, vUv + t) +
