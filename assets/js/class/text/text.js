@@ -81,7 +81,12 @@ export default class{
         const width = right - left
         const height = bottom - top
 
-        const renderTarget = new THREE.WebGLRenderTarget(width, height, {format: THREE.RGBAFormat})
+        const renderTarget = new THREE.WebGLRenderTarget(width, height, {
+            minFilter: THREE.LinearFilter,
+            magFilter: THREE.LinearFilter,
+            format: THREE.RGBAFormat,
+            type: THREE.HalfFloatType
+        })
         renderTarget.samples = 2048
         
         this.composer = new EffectComposer(this.renderer, renderTarget)
